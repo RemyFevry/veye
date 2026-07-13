@@ -50,7 +50,7 @@ jobs:
           # Try to install veye from npm first. If that fails (not yet
           # published), skip the gate with a warning instead of failing
           # the PR. Once veye is on npm, this fallback can be removed.
-          if npm install -g "veye@${VEYE_VERSION}" 2>/dev/null; then
+          if npm install -g "veye@\${VEYE_VERSION}" 2>/dev/null; then
             echo "veye installed from npm"
             echo "veye_available=true" >> $GITHUB_OUTPUT
           else
