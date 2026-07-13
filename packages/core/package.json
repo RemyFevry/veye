@@ -1,0 +1,29 @@
+{
+  "name": "@veye/core",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@effect/schema": "^0.75.0",
+    "@effect/platform": "^0.70.0",
+    "@effect/platform-node": "^0.60.0",
+    "effect": "^3.13.0",
+    "picomatch": "^4.0.0",
+    "yaml": "^2.5.0"
+  },
+  "devDependencies": {
+    "@types/picomatch": "^4.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

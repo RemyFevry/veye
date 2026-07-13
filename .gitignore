@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.veye/freshness.json
+wiki.dist/
+.DS_Store
+*.log
+
+# agentic-tools is a separate repo (cloned inside this workspace)
+agentic-tools/
+
+# Scratch and dev-only
+.scratch/
+.opencode/

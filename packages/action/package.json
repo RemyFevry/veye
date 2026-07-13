@@ -1,0 +1,16 @@
+{
+  "name": "@veye/action",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@veye/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^5.8.0"
+  }
+}

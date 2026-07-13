@@ -1,0 +1,61 @@
+name: 'Veye Freshness'
+description: 'Doc freshness gate — measure and enforce documentation freshness'
+
+inputs:
+  mode:
+    description: 'compute or gate'
+    required: true
+    default: 'gate'
+  repo-root:
+    description: 'Repository root path'
+    required: false
+    default: '.'
+  base-sha:
+    description: 'Base commit SHA (gate mode)'
+    required: false
+    default: ''
+  head-sha:
+    description: 'Head commit SHA (gate mode)'
+    required: false
+    default: ''
+  pr-number:
+    description: 'Pull request number (gate mode)'
+    required: false
+    default: ''
+  draft:
+    description: 'Is PR a draft? (gate mode)'
+    required: false
+    default: 'false'
+  labels:
+    description: 'Comma-separated PR labels (gate mode)'
+    required: false
+    default: ''
+
+outputs:
+  status:
+    description: 'Gate status (success or failure)'
+    value: ${{ steps.veye.outputs.status }}
+  failing-pages:
+    description: 'Number of failing pages'
+    value: ${{ steps.veye.outputs.failing-pages }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    - name: Run Veye
+      id: veye
+      shell: bash
+      env:
+        INPUT_MODE: ${{ inputs.mode }}
+        INPUT_REPO_ROOT: ${{ inputs.repo-root }}
+        INPUT_BASE_SHA: ${{ inputs.base-sha }}
+        INPUT_HEAD_SHA: ${{ inputs.head-sha }}
+        INPUT_PR_NUMBER: ${{ inputs.pr-number }}
+        INPUT_DRAFT: ${{ inputs.draft }}
+        INPUT_LABELS: ${{ inputs.labels }}
+        GITHUB_TOKEN: ${{ github.token }}
+      run: bun run ${{ github.action_path }}/src/index.ts
