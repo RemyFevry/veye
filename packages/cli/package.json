@@ -1,6 +1,6 @@
 {
   "name": "@color-sunset/veye",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "Doc-freshness engine — measure, surface, and gate on documentation staleness",
   "keywords": [
@@ -34,7 +34,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "bun build src/cli.ts --outfile dist/cli.js --target=node",
+    "build": "bun build src/cli.ts --outfile dist/cli.js --target=node && sed -i '' '1s|.*|#!/usr/bin/env node|' dist/cli.js",
     "dev": "bun run src/cli.ts",
     "typecheck": "tsc --noEmit"
   },
