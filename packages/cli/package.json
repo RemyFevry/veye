@@ -14,18 +14,17 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/veye/veye.git"
+    "url": "https://github.com/RemyFevry/veye.git"
   },
-  "homepage": "https://github.com/veye/veye",
+  "homepage": "https://github.com/RemyFevry/veye",
   "bugs": {
-    "url": "https://github.com/veye/veye/issues"
+    "url": "https://github.com/RemyFevry/veye/issues"
   },
   "engines": {
     "node": ">=18"
   },
   "files": [
     "dist",
-    "src",
     "README.md"
   ],
   "bin": {
@@ -34,22 +33,10 @@
   "publishConfig": {
     "access": "public"
   },
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts"
-    }
-  },
   "scripts": {
-    "build": "tsc",
+    "build": "bun build src/cli.ts --outfile dist/cli.js --target=node",
     "dev": "bun run src/cli.ts",
-    "typecheck": "tsc --noEmit",
-    "prepublishOnly": "bun build src/cli.ts --outfile dist/cli.js --target=bun"
+    "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "@veye/core": "workspace:*"
-  },
-  "peerDependencies": {
-    "typescript": "^5.8.0"
-  }
+  "dependencies": {}
 }
