@@ -1,5 +1,5 @@
 {
-  "name": "veye",
+  "name": "@color-sunset/veye",
   "version": "0.1.0",
   "type": "module",
   "description": "Doc-freshness engine — measure, surface, and gate on documentation staleness",
