@@ -98,11 +98,20 @@ Imports are auto-organized by Biome's `assist.organizeImports`.
   GitHub Release) and `publish.yml` (publish `@color-sunset/veye` to npm). Homebrew formula
   lives in `packaging/homebrew/`.
 
-## Ignore this stuff — it is tooling, not the product
+## Berth agent orchestration (dev dependency)
 
-- `master`, `layer1`, `layer2`, `feat`, `ship` in `package.json` scripts are **berth agent
-  orchestration** wrappers (linked worktrees, herdr workspaces). They are not build/test
-  commands; do not invoke them to verify code.
+Berth is a **dev dependency** in this repo and a core part of how multi-agent work happens
+here — learn it and use it. It wires together linked git worktrees and herdr workspaces so
+several agents can work in parallel without clobbering each other.
+
+The `package.json` scripts `master`, `layer1`, `layer2`, `feat`, `ship` are berth wrappers.
+These are **agent orchestration entry points, not build/test commands** — they will not
+compile or verify your code, so do not invoke them as a substitute for
+`bun run typecheck` / `bun run lint` / `bun test`. Use berth to coordinate work across
+worktrees; use the toolchain commands above to validate it.
+
+## Tooling that is not part of the shipped packages
+
 - `.opencode/`, `.pi/`, `.pi-subagents/`, `veye-skills/`, `.scratch/` are agent/skill
   tooling (mostly gitignored). Not part of the shipped packages.
 - This repo uses **OpenSpec** for spec-driven changes (`openspec/changes/`,
