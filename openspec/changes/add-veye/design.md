@@ -14,7 +14,7 @@ Key constraints that shape the design:
 - **Authored files are never written to by Veye.** The engine reads `docs/wiki/*.md` but all generated output lives in `docs/wiki.dist/` (ephemeral) and `.veye/freshness.json` (committed). Strict source/generated separation.
 - **The wiki is in-repo and PR-reviewed.** This is non-negotiable — it is what couples docs to code, what makes the freshness engine tractable, and what makes the gate enforceable.
 
-Stakeholders: any team maintaining documentation alongside code; agents reasoning over that documentation (who consume the freshness score as a trust signal).
+Stakeholders: any team maintaining documentation alongside code. The primary doc consumer is humans — especially humans navigating codebases they increasingly didn't author directly (agent-generated code), where the wiki serves as the only tractable map. Agents are a secondary, narrow consumer: they read code directly for implementation tasks and consult docs only for architectural context, spec-driven workflows, or explicit agent-facing files (AGENTS.md, cursor rules). The freshness score is a trust signal primarily for the human reader deciding whether to rely on a page.
 
 ## Goals / Non-Goals
 
@@ -242,7 +242,7 @@ Defaults: `fresh_window = 30`, `stale_horizon = 180`.
 
 **[R1] Bot commits on every qualifying push.** → One file (`.veye/freshness.json`), `[skip ci]`, `paths-ignore` in CI. Low noise; scannable via `git log --oneline -- .veye/freshness.json`.
 
-**[R2] `direct_code_delta` is a proxy.** Large behavior-neutral refactors spike the delta. → Gate's body-change path passes on any doc touch; `acknowledged_debt` covers no-op refactors; delta is lines-and-commits, not raw churn.
+**[R2] `direct_code_delta` is a proxy, and `covers` globs create a granularity mismatch.** Two related problems: (1) Large behavior-neutral refactors spike the delta. (2) More fundamentally, a doc describes a *concept or flow* while `covers: src/auth/**` claims every *file* in a tree. A one-line fix to `src/auth/utils/log.ts` flags the auth architecture doc as stale when the doc is perfectly accurate. This conceptual-vs-file scope mismatch produces false positives that erode trust in the gate over time — the team learns to route around it (`veye:docs-only` on everything) and the gate becomes noise. → Partial mitigations: `acknowledged_debt` for known false positives; narrower globs where the doc genuinely maps to a subtree; lint can warn on overly broad globs paired with high-level page types. No structural fix exists in v1 — the glob model is a deliberate simplicity trade-off.
 
 **[R3] LLM KPIs false positives erode trust.** → Skills are human-in-the-loop; advisory mode by default; teams enable scoring only when they trust the findings.
 
@@ -253,6 +253,10 @@ Defaults: `fresh_window = 30`, `stale_horizon = 180`.
 **[R6] Composite formula is a guess.** → All weights, combinator, and KPI parameters configurable. Opinionated defaults; expect tuning.
 
 **[R7] Dashboard only on published site (not GitHub raw view of authored tree).** → JSON is always available on GitHub for programmatic access. Gate comment is the primary contributor surface on GitHub. Published site is where maintainers browse.
+
+**[R8] Gate gameability — body-change detection is trivially satisfiable.** The gate asks "did you edit the page body?" but a body edit can be cosmetic (reword a sentence, add a trailing space). This mirrors the structural weakness of test-coverage gates: a gate measuring *activity* (was the file touched?) rather than *quality* (was the doc actually re-verified?) produces compliance theater. PR review is the asserted backstop, but on low-traffic or single-maintainer repos it is thin. → Partial mitigations: the advisory-first adoption path surfaces the problem before it bites; `acknowledged_debt` makes short-cutting visible rather than hidden; dashboard can expose pages whose body changed but whose `direct_code_delta` remained high (suspicious pattern). No full mitigation exists in v1 — this is an accepted structural limitation, same as coverage gates.
+
+**[R9] Strategic risk — the substrate Veye operates on (authored wiki docs) may shrink.** If the trend toward agents-as-interface continues — humans ask agents questions, agents read code and answer — the volume of authored wiki docs may decline rather than grow over the product's lifetime. Veye's entire value proposition is predicated on teams maintaining structured documentation worth measuring. **The bet Veye makes:** docs survive and grow because (a) humans need maps of code they increasingly didn't write and can't re-walk at scale, (b) architectural rationale and decision records cannot be derived from code, (c) spec-driven development (OpenSpec, spec-kit) is itself a growing docs-as-source-of-truth movement. **What would invalidate this bet:** if agents become reliable enough that humans stop reading docs directly and delegate all understanding to agent Q&A. Monitor: wiki page creation rate in adopting repos, agent-facing doc format adoption (AGENTS.md growth).
 
 ## Migration Plan
 

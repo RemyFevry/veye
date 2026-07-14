@@ -1,6 +1,6 @@
 ## Why
 
-Documentation rots silently. Teams bury docs in scattered `.md` files with no signal of whether a page is still trustworthy, no enforcement that code changes drag their docs along, and no visibility into which pages have drifted from the code they describe. The result is docs that look authoritative but lie — harmful for humans, worse for the agents increasingly asked to reason over them. Veye closes this gap by treating doc freshness as a first-class, measurable, enforceable property of a repo, in the same way teams already treat test coverage.
+Documentation rots silently. Teams bury docs in scattered `.md` files with no signal of whether a page is still trustworthy, no enforcement that code changes drag their docs along, and no visibility into which pages have drifted from the code they describe. The result is docs that look authoritative but lie. This pain is intensifying: as agents write more code, humans increasingly depend on documentation as their map of a codebase they didn't author and can't fully re-walk at scale. A stale doc in that world isn't a mild annoyance — it's a misleading map over unfamiliar territory. Veye closes this gap by treating doc freshness as a first-class, measurable, enforceable property of a repo, in the same way teams already treat test coverage.
 
 ## What Changes
 
