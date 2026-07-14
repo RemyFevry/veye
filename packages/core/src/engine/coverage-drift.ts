@@ -14,22 +14,18 @@ export function extractPaths(body: string): string[] {
   const stripped = body.replace(/```[\s\S]*?```/g, '');
   const found = new Set<string>();
   const tick = /`([^`\n]+)`/g;
-  let m: RegExpExecArray | null = tick.exec(stripped);
-  while (m !== null) {
+  for (const m of stripped.matchAll(tick)) {
     const inner = m[1];
     if (!inner) continue;
     if (!inner.includes('/')) continue;
     if (inner.includes('://')) continue;
     if (inner.includes(' ')) continue;
     found.add(inner.trim());
-    m = tick.exec(stripped);
   }
   const bare = /\b([A-Za-z0-9._-]+\/[A-Za-z0-9._/-]+\.[A-Za-z]{1,8})\b/g;
-  m = bare.exec(stripped);
-  while (m !== null) {
+  for (const m of stripped.matchAll(bare)) {
     const p = m[1];
     if (p && !p.includes('://')) found.add(p);
-    m = bare.exec(stripped);
   }
   return [...found];
 }
