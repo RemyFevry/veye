@@ -9,8 +9,8 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import {
-  DEFAULT_CONFIG,
   type Combinator,
+  DEFAULT_CONFIG,
   type KpiMode,
   type KpiName,
   type KpiParams,
@@ -68,9 +68,7 @@ export async function loadConfig(repoRoot: string): Promise<VeyeConfig> {
   try {
     parsed = parseYaml(content);
   } catch (e) {
-    throw new ConfigValidationError([
-      `YAML parse error: ${(e as Error).message}`,
-    ]);
+    throw new ConfigValidationError([`YAML parse error: ${(e as Error).message}`]);
   }
   return validateConfig(parsed);
 }

@@ -1,4 +1,4 @@
-import type { GitService, KpiParams, KpiScore } from '../types/index.js';
+import type { GitDelta, GitService, KpiParams, KpiScore } from '../types/index.js';
 
 export interface DirectCodeDeltaInput {
   covers: string[];
@@ -20,13 +20,7 @@ function round2(v: number): number {
 }
 
 export async function direct_code_delta(input: DirectCodeDeltaInput): Promise<KpiScore> {
-  const {
-    covers,
-    last_verified,
-    last_verified_commit,
-    params = {},
-    git,
-  } = input;
+  const { covers, last_verified, last_verified_commit, params = {}, git } = input;
   const linesThreshold = params.lines_threshold ?? 500;
   const commitsThreshold = params.commits_threshold ?? 50;
 
@@ -34,7 +28,7 @@ export async function direct_code_delta(input: DirectCodeDeltaInput): Promise<Kp
     return { score: 100, raw: { lines_changed: 0, commits: 0 }, triggered: false };
   }
 
-  let delta;
+  let delta: GitDelta;
   if (last_verified_commit) {
     delta = await git.deltaSinceCommit(covers, last_verified_commit);
   } else if (last_verified) {

@@ -1,9 +1,4 @@
-import type {
-  FreshnessJson,
-  KpiName,
-  PageType,
-  StatusCode,
-} from '@veye/core';
+import type { FreshnessJson, KpiName, PageType, StatusCode } from '@veye/core';
 
 export interface DashboardFilters {
   readonly types?: readonly PageType[];
@@ -46,7 +41,7 @@ const ALL_TYPES: readonly PageType[] = ['architecture', 'component', 'concept', 
 function normalizeFilters(
   filters: DashboardFilters,
   availableTypes: readonly PageType[],
-  scoreRange: readonly [number, number],
+  scoreRange: readonly [number, number]
 ): Required<DashboardFilters> {
   return {
     types: filters.types !== undefined ? [...filters.types] : [...availableTypes],
@@ -70,7 +65,7 @@ function buildSummary(freshness: FreshnessJson): DashboardSummaryData {
 
 export function buildInteractiveDashboard(
   freshness: FreshnessJson,
-  filters: DashboardFilters = {},
+  filters: DashboardFilters = {}
 ): InteractiveDashboardData {
   const allResults = Object.values(freshness.pages);
 

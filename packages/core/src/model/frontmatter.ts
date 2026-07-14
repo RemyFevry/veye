@@ -5,12 +5,7 @@
  * validated; unknown fields are preserved verbatim in `custom` (permissive validation).
  */
 import { parse as parseYaml } from 'yaml';
-import type {
-  KpiName,
-  PageType,
-  VeyeFrontmatter,
-  VeyePage,
-} from '../types/index.js';
+import type { KpiName, PageType, VeyeFrontmatter, VeyePage } from '../types/index.js';
 
 const PAGE_TYPES: ReadonlySet<string> = new Set<PageType>([
   'architecture',
@@ -87,12 +82,7 @@ export function splitFrontmatter(raw: string): SplitFrontmatter {
   return { yaml, body };
 }
 
-function makeErrorPage(
-  pagePath: string,
-  raw: string,
-  body: string,
-  errors: string[],
-): VeyePage {
+function makeErrorPage(pagePath: string, raw: string, body: string, errors: string[]): VeyePage {
   const placeholderFm: VeyeFrontmatter = {
     veye: true,
     title: '',
@@ -144,7 +134,7 @@ export function parseFrontmatter(raw: string, pagePath: string): VeyePage | null
   }
 
   const record = parsed;
-  if (record['veye'] !== true) {
+  if (record.veye !== true) {
     return null;
   }
 
@@ -152,43 +142,37 @@ export function parseFrontmatter(raw: string, pagePath: string): VeyePage | null
   const custom: Record<string, unknown> = {};
 
   let title = '';
-  if (typeof record['title'] === 'string') {
-    title = record['title'];
+  if (typeof record.title === 'string') {
+    title = record.title;
   } else {
     errors.push('Missing or invalid required field "title": expected a string');
   }
 
   let type: PageType = 'architecture';
-  const typeRaw = record['type'];
+  const typeRaw = record.type;
   if (typeof typeRaw === 'string') {
     if (PAGE_TYPES.has(typeRaw)) {
       type = typeRaw as PageType;
     } else {
-      errors.push(
-        `Invalid "type" value "${typeRaw}": must be one of ${PAGE_TYPE_VALUES}`,
-      );
+      errors.push(`Invalid "type" value "${typeRaw}": must be one of ${PAGE_TYPE_VALUES}`);
     }
   } else {
-    errors.push(
-      `Missing or invalid required field "type": expected one of ${PAGE_TYPE_VALUES}`,
-    );
+    errors.push(`Missing or invalid required field "type": expected one of ${PAGE_TYPE_VALUES}`);
   }
 
   let covers: string[] = [];
-  if (isStringArray(record['covers'])) {
-    covers = record['covers'];
+  if (isStringArray(record.covers)) {
+    covers = record.covers;
   } else {
-    errors.push(
-      'Missing or invalid required field "covers": expected an array of strings',
-    );
+    errors.push('Missing or invalid required field "covers": expected an array of strings');
   }
 
   let lastVerified = '';
-  if (typeof record['last_verified'] === 'string') {
-    lastVerified = record['last_verified'];
+  if (typeof record.last_verified === 'string') {
+    lastVerified = record.last_verified;
   } else {
     errors.push(
-      'Missing or invalid required field "last_verified": expected an ISO-8601 date string',
+      'Missing or invalid required field "last_verified": expected an ISO-8601 date string'
     );
   }
 
@@ -201,29 +185,29 @@ export function parseFrontmatter(raw: string, pagePath: string): VeyePage | null
     custom,
   };
 
-  if (isStringArray(record['specs'])) {
-    fm.specs = record['specs'];
+  if (isStringArray(record.specs)) {
+    fm.specs = record.specs;
   }
-  if (isStringArray(record['depends_on'])) {
-    fm.depends_on = record['depends_on'];
+  if (isStringArray(record.depends_on)) {
+    fm.depends_on = record.depends_on;
   }
-  if (typeof record['threshold'] === 'number') {
-    fm.threshold = record['threshold'];
+  if (typeof record.threshold === 'number') {
+    fm.threshold = record.threshold;
   }
-  if (isKpiNameArray(record['exclude_kpis'])) {
-    fm.exclude_kpis = record['exclude_kpis'];
+  if (isKpiNameArray(record.exclude_kpis)) {
+    fm.exclude_kpis = record.exclude_kpis;
   }
-  if (typeof record['acknowledged_debt'] === 'string') {
-    fm.acknowledged_debt = record['acknowledged_debt'];
+  if (typeof record.acknowledged_debt === 'string') {
+    fm.acknowledged_debt = record.acknowledged_debt;
   }
-  if (typeof record['last_verified_commit'] === 'string') {
-    fm.last_verified_commit = record['last_verified_commit'];
+  if (typeof record.last_verified_commit === 'string') {
+    fm.last_verified_commit = record.last_verified_commit;
   }
-  if (typeof record['veye_schema_version'] === 'number') {
-    fm.veye_schema_version = record['veye_schema_version'];
+  if (typeof record.veye_schema_version === 'number') {
+    fm.veye_schema_version = record.veye_schema_version;
   }
-  if (typeof record['generated'] === 'boolean') {
-    fm.generated = record['generated'];
+  if (typeof record.generated === 'boolean') {
+    fm.generated = record.generated;
   }
 
   for (const key of Object.keys(record)) {

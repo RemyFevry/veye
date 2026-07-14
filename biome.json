@@ -13,10 +13,10 @@
       "**/*.js",
       "**/*.jsx",
       "**/*.json",
-      "!**/node_modules/**",
-      "!**/dist/**",
-      "!**/wiki.dist/**",
-      "!test/fixtures/**"
+      "!**/node_modules",
+      "!**/dist",
+      "!**/wiki.dist",
+      "!test/fixtures"
     ]
   },
   "formatter": {

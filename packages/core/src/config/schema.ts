@@ -11,8 +11,8 @@
  */
 import { parse as parseYaml } from 'yaml';
 import {
-  DEFAULT_CONFIG,
   type Combinator,
+  DEFAULT_CONFIG,
   type GateMode,
   type KpiMode,
   type KpiName,
@@ -65,28 +65,14 @@ const KPI_NAMES: ReadonlySet<string> = new Set<string>([
 ]);
 
 const COMBINATORS: ReadonlySet<string> = new Set<string>(['weighted-avg', 'min']);
-const KPI_MODES: ReadonlySet<string> = new Set<string>([
-  'enabled',
-  'disabled',
-  'advisory',
-]);
+const KPI_MODES: ReadonlySet<string> = new Set<string>(['enabled', 'disabled', 'advisory']);
 const GATE_MODES: ReadonlySet<string> = new Set<string>(['advisory', 'blocking']);
 const STATUS_STYLES: ReadonlySet<string> = new Set<string>(['emoji', 'text', 'none']);
 
 const GATE_KEYS: ReadonlySet<string> = new Set<string>(['mode', 'docs_only_label']);
-const FRESHNESS_BLOCK_KEYS: ReadonlySet<string> = new Set<string>([
-  'status_style',
-  'status_emoji',
-]);
-const STATUS_THRESHOLDS_KEYS: ReadonlySet<string> = new Set<string>([
-  'fresh',
-  'warning',
-]);
-const STATUS_EMOJI_KEYS: ReadonlySet<string> = new Set<string>([
-  'fresh',
-  'warning',
-  'critical',
-]);
+const FRESHNESS_BLOCK_KEYS: ReadonlySet<string> = new Set<string>(['status_style', 'status_emoji']);
+const STATUS_THRESHOLDS_KEYS: ReadonlySet<string> = new Set<string>(['fresh', 'warning']);
+const STATUS_EMOJI_KEYS: ReadonlySet<string> = new Set<string>(['fresh', 'warning', 'critical']);
 
 export class ConfigValidationError extends Error {
   readonly errors: string[];
@@ -117,11 +103,7 @@ function quoteList(values: Iterable<string>): string {
   return [...values].join(', ');
 }
 
-function validateWeightsObject(
-  w: unknown,
-  path: string,
-  errors: string[],
-): void {
+function validateWeightsObject(w: unknown, path: string, errors: string[]): void {
   if (!isObject(w)) {
     errors.push(`"${path}" must be an object`);
     return;
@@ -135,11 +117,7 @@ function validateWeightsObject(
   }
 }
 
-function validateKpiModesObject(
-  m: unknown,
-  path: string,
-  errors: string[],
-): void {
+function validateKpiModesObject(m: unknown, path: string, errors: string[]): void {
   if (!isObject(m)) {
     errors.push(`"${path}" must be an object`);
     return;
@@ -147,22 +125,13 @@ function validateKpiModesObject(
   for (const k of Object.keys(m)) {
     if (!KPI_NAMES.has(k)) {
       errors.push(`Unknown KPI name "${k}" in "${path}"`);
-    } else if (
-      typeof m[k] !== 'string' ||
-      !KPI_MODES.has(m[k] as string)
-    ) {
-      errors.push(
-        `"${path}.${k}" must be one of: ${quoteList(KPI_MODES)}`,
-      );
+    } else if (typeof m[k] !== 'string' || !KPI_MODES.has(m[k] as string)) {
+      errors.push(`"${path}.${k}" must be one of: ${quoteList(KPI_MODES)}`);
     }
   }
 }
 
-function validateKpiParamsObject(
-  kp: unknown,
-  path: string,
-  errors: string[],
-): void {
+function validateKpiParamsObject(kp: unknown, path: string, errors: string[]): void {
   if (!isObject(kp)) {
     errors.push(`"${path}" must be an object`);
     return;
@@ -180,19 +149,13 @@ function validateKpiParamsObject(
     for (const pk of Object.keys(inner)) {
       const v = inner[pk];
       if (typeof v !== 'number' && typeof v !== 'string') {
-        errors.push(
-          `"${path}.${k}.${pk}" must be a number or string`,
-        );
+        errors.push(`"${path}.${k}.${pk}" must be a number or string`);
       }
     }
   }
 }
 
-function validateStatusThresholds(
-  st: unknown,
-  path: string,
-  errors: string[],
-): void {
+function validateStatusThresholds(st: unknown, path: string, errors: string[]): void {
   if (!isObject(st)) {
     errors.push(`"${path}" must be an object`);
     return;
@@ -209,57 +172,41 @@ function validateStatusThresholds(
 function validateSectionConfig(
   sec: Record<string, unknown>,
   pathKey: string,
-  errors: string[],
+  errors: string[]
 ): void {
   for (const k of Object.keys(sec)) {
     if (!SECTION_KEYS.has(k)) {
       errors.push(
-        `Field "${k}" in "sections.${pathKey}" is not overridable at section level — only computation fields (${quoteList(SECTION_KEYS)}) may be overridden`,
+        `Field "${k}" in "sections.${pathKey}" is not overridable at section level — only computation fields (${quoteList(SECTION_KEYS)}) may be overridden`
       );
     }
   }
-  if (
-    'threshold' in sec &&
-    typeof sec['threshold'] !== 'number'
-  ) {
+  if ('threshold' in sec && typeof sec.threshold !== 'number') {
     errors.push(`"sections.${pathKey}.threshold" must be a number`);
   }
   if (
     'combinator' in sec &&
-    (typeof sec['combinator'] !== 'string' ||
-      !COMBINATORS.has(sec['combinator'] as string))
+    (typeof sec.combinator !== 'string' || !COMBINATORS.has(sec.combinator as string))
   ) {
-    errors.push(
-      `"sections.${pathKey}.combinator" must be one of: ${quoteList(COMBINATORS)}`,
-    );
+    errors.push(`"sections.${pathKey}.combinator" must be one of: ${quoteList(COMBINATORS)}`);
   }
-  if ('exclude' in sec && !isStringArray(sec['exclude'])) {
-    errors.push(
-      `"sections.${pathKey}.exclude" must be an array of strings`,
-    );
+  if ('exclude' in sec && !isStringArray(sec.exclude)) {
+    errors.push(`"sections.${pathKey}.exclude" must be an array of strings`);
   }
   if ('weights' in sec) {
-    validateWeightsObject(sec['weights'], `sections.${pathKey}.weights`, errors);
+    validateWeightsObject(sec.weights, `sections.${pathKey}.weights`, errors);
   }
   if ('kpi_modes' in sec) {
-    validateKpiModesObject(
-      sec['kpi_modes'],
-      `sections.${pathKey}.kpi_modes`,
-      errors,
-    );
+    validateKpiModesObject(sec.kpi_modes, `sections.${pathKey}.kpi_modes`, errors);
   }
   if ('kpi_params' in sec) {
-    validateKpiParamsObject(
-      sec['kpi_params'],
-      `sections.${pathKey}.kpi_params`,
-      errors,
-    );
+    validateKpiParamsObject(sec.kpi_params, `sections.${pathKey}.kpi_params`, errors);
   }
   if ('status_thresholds' in sec) {
     validateStatusThresholds(
-      sec['status_thresholds'],
+      sec.status_thresholds,
       `sections.${pathKey}.status_thresholds`,
-      errors,
+      errors
     );
   }
 }
@@ -278,9 +225,7 @@ export function validateConfig(raw: unknown): VeyeConfig {
     return cloneDefaults();
   }
   if (!isObject(raw)) {
-    throw new ConfigValidationError([
-      'Top-level config must be a YAML object/mapping',
-    ]);
+    throw new ConfigValidationError(['Top-level config must be a YAML object/mapping']);
   }
 
   const errors: string[] = [];
@@ -291,62 +236,52 @@ export function validateConfig(raw: unknown): VeyeConfig {
     }
   }
 
-  if ('wiki_root' in raw && typeof raw['wiki_root'] !== 'string') {
+  if ('wiki_root' in raw && typeof raw.wiki_root !== 'string') {
     errors.push('"wiki_root" must be a string');
   }
-  if (
-    'wiki_dist_root' in raw &&
-    typeof raw['wiki_dist_root'] !== 'string'
-  ) {
+  if ('wiki_dist_root' in raw && typeof raw.wiki_dist_root !== 'string') {
     errors.push('"wiki_dist_root" must be a string');
   }
-  if ('threshold' in raw && typeof raw['threshold'] !== 'number') {
+  if ('threshold' in raw && typeof raw.threshold !== 'number') {
     errors.push('"threshold" must be a number');
   }
   if (
     'combinator' in raw &&
-    (typeof raw['combinator'] !== 'string' ||
-      !COMBINATORS.has(raw['combinator'] as string))
+    (typeof raw.combinator !== 'string' || !COMBINATORS.has(raw.combinator as string))
   ) {
     errors.push(`"combinator" must be one of: ${quoteList(COMBINATORS)}`);
   }
-  if ('cadence' in raw && typeof raw['cadence'] !== 'string') {
+  if ('cadence' in raw && typeof raw.cadence !== 'string') {
     errors.push('"cadence" must be a string');
   }
-  if ('timezone' in raw && typeof raw['timezone'] !== 'string') {
+  if ('timezone' in raw && typeof raw.timezone !== 'string') {
     errors.push('"timezone" must be a string');
   }
-  if (
-    'schema_version' in raw &&
-    typeof raw['schema_version'] !== 'number'
-  ) {
+  if ('schema_version' in raw && typeof raw.schema_version !== 'number') {
     errors.push('"schema_version" must be a number');
   }
-  if ('exclude' in raw && !isStringArray(raw['exclude'])) {
+  if ('exclude' in raw && !isStringArray(raw.exclude)) {
     errors.push('"exclude" must be an array of strings');
   }
-  if (
-    'source_adapters' in raw &&
-    !isStringArray(raw['source_adapters'])
-  ) {
+  if ('source_adapters' in raw && !isStringArray(raw.source_adapters)) {
     errors.push('"source_adapters" must be an array of strings');
   }
 
   if ('weights' in raw) {
-    validateWeightsObject(raw['weights'], 'weights', errors);
+    validateWeightsObject(raw.weights, 'weights', errors);
   }
   if ('kpi_modes' in raw) {
-    validateKpiModesObject(raw['kpi_modes'], 'kpi_modes', errors);
+    validateKpiModesObject(raw.kpi_modes, 'kpi_modes', errors);
   }
   if ('kpi_params' in raw) {
-    validateKpiParamsObject(raw['kpi_params'], 'kpi_params', errors);
+    validateKpiParamsObject(raw.kpi_params, 'kpi_params', errors);
   }
   if ('status_thresholds' in raw) {
-    validateStatusThresholds(raw['status_thresholds'], 'status_thresholds', errors);
+    validateStatusThresholds(raw.status_thresholds, 'status_thresholds', errors);
   }
 
   if ('gate' in raw) {
-    const g = raw['gate'];
+    const g = raw.gate;
     if (!isObject(g)) {
       errors.push('"gate" must be an object');
     } else {
@@ -355,23 +290,17 @@ export function validateConfig(raw: unknown): VeyeConfig {
           errors.push(`Unknown field "${k}" in "gate"`);
         }
       }
-      if (
-        'mode' in g &&
-        (typeof g['mode'] !== 'string' || !GATE_MODES.has(g['mode'] as string))
-      ) {
+      if ('mode' in g && (typeof g.mode !== 'string' || !GATE_MODES.has(g.mode as string))) {
         errors.push(`"gate.mode" must be one of: ${quoteList(GATE_MODES)}`);
       }
-      if (
-        'docs_only_label' in g &&
-        typeof g['docs_only_label'] !== 'string'
-      ) {
+      if ('docs_only_label' in g && typeof g.docs_only_label !== 'string') {
         errors.push('"gate.docs_only_label" must be a string');
       }
     }
   }
 
   if ('freshness_block' in raw) {
-    const fb = raw['freshness_block'];
+    const fb = raw.freshness_block;
     if (!isObject(fb)) {
       errors.push('"freshness_block" must be an object');
     } else {
@@ -382,27 +311,20 @@ export function validateConfig(raw: unknown): VeyeConfig {
       }
       if (
         'status_style' in fb &&
-        (typeof fb['status_style'] !== 'string' ||
-          !STATUS_STYLES.has(fb['status_style'] as string))
+        (typeof fb.status_style !== 'string' || !STATUS_STYLES.has(fb.status_style as string))
       ) {
-        errors.push(
-          `"freshness_block.status_style" must be one of: ${quoteList(STATUS_STYLES)}`,
-        );
+        errors.push(`"freshness_block.status_style" must be one of: ${quoteList(STATUS_STYLES)}`);
       }
       if ('status_emoji' in fb) {
-        const se = fb['status_emoji'];
+        const se = fb.status_emoji;
         if (!isObject(se)) {
           errors.push('"freshness_block.status_emoji" must be an object');
         } else {
           for (const k of Object.keys(se)) {
             if (!STATUS_EMOJI_KEYS.has(k)) {
-              errors.push(
-                `Unknown field "${k}" in "freshness_block.status_emoji"`,
-              );
+              errors.push(`Unknown field "${k}" in "freshness_block.status_emoji"`);
             } else if (typeof se[k] !== 'string') {
-              errors.push(
-                `"freshness_block.status_emoji.${k}" must be a string`,
-              );
+              errors.push(`"freshness_block.status_emoji.${k}" must be a string`);
             }
           }
         }
@@ -411,11 +333,9 @@ export function validateConfig(raw: unknown): VeyeConfig {
   }
 
   if ('sections' in raw) {
-    const sec = raw['sections'];
+    const sec = raw.sections;
     if (!isObject(sec)) {
-      errors.push(
-        '"sections" must be an object mapping path keys to section configs',
-      );
+      errors.push('"sections" must be an object mapping path keys to section configs');
     } else {
       for (const [pathKey, secValue] of Object.entries(sec)) {
         if (!isObject(secValue)) {
@@ -436,23 +356,20 @@ export function validateConfig(raw: unknown): VeyeConfig {
 
 function buildSectionConfig(raw: Record<string, unknown>): SectionConfig {
   const sec: SectionConfig = {};
-  if (typeof raw['threshold'] === 'number') {
-    sec.threshold = raw['threshold'];
+  if (typeof raw.threshold === 'number') {
+    sec.threshold = raw.threshold;
   }
-  if (
-    typeof raw['combinator'] === 'string' &&
-    COMBINATORS.has(raw['combinator'])
-  ) {
-    sec.combinator = raw['combinator'] as Combinator;
+  if (typeof raw.combinator === 'string' && COMBINATORS.has(raw.combinator)) {
+    sec.combinator = raw.combinator as Combinator;
   }
-  if (isStringArray(raw['exclude'])) {
-    sec.exclude = raw['exclude'];
+  if (isStringArray(raw.exclude)) {
+    sec.exclude = raw.exclude;
   }
-  if (isObject(raw['weights'])) {
+  if (isObject(raw.weights)) {
     const w: Partial<Record<KpiName, number>> = {};
-    for (const k of Object.keys(raw['weights'])) {
+    for (const k of Object.keys(raw.weights)) {
       if (KPI_NAMES.has(k)) {
-        const val = raw['weights'][k];
+        const val = raw.weights[k];
         if (typeof val === 'number') {
           w[k as KpiName] = val;
         }
@@ -460,11 +377,11 @@ function buildSectionConfig(raw: Record<string, unknown>): SectionConfig {
     }
     sec.weights = w;
   }
-  if (isObject(raw['kpi_modes'])) {
+  if (isObject(raw.kpi_modes)) {
     const m: Partial<Record<KpiName, KpiMode>> = {};
-    for (const k of Object.keys(raw['kpi_modes'])) {
+    for (const k of Object.keys(raw.kpi_modes)) {
       if (KPI_NAMES.has(k)) {
-        const val = raw['kpi_modes'][k];
+        const val = raw.kpi_modes[k];
         if (typeof val === 'string' && KPI_MODES.has(val)) {
           m[k as KpiName] = val as KpiMode;
         }
@@ -472,11 +389,11 @@ function buildSectionConfig(raw: Record<string, unknown>): SectionConfig {
     }
     sec.kpi_modes = m;
   }
-  if (isObject(raw['kpi_params'])) {
+  if (isObject(raw.kpi_params)) {
     const kp: Partial<Record<KpiName, KpiParams>> = {};
-    for (const k of Object.keys(raw['kpi_params'])) {
+    for (const k of Object.keys(raw.kpi_params)) {
       if (KPI_NAMES.has(k)) {
-        const v = raw['kpi_params'][k];
+        const v = raw.kpi_params[k];
         if (isObject(v)) {
           const params: KpiParams = {};
           for (const pk of Object.keys(v)) {
@@ -491,11 +408,11 @@ function buildSectionConfig(raw: Record<string, unknown>): SectionConfig {
     }
     sec.kpi_params = kp;
   }
-  if (isObject(raw['status_thresholds'])) {
-    const st = raw['status_thresholds'];
+  if (isObject(raw.status_thresholds)) {
+    const st = raw.status_thresholds;
     const out: { fresh?: number; warning?: number } = {};
-    if (typeof st['fresh'] === 'number') out.fresh = st['fresh'];
-    if (typeof st['warning'] === 'number') out.warning = st['warning'];
+    if (typeof st.fresh === 'number') out.fresh = st.fresh;
+    if (typeof st.warning === 'number') out.warning = st.warning;
     if (Object.keys(out).length > 0) {
       sec.status_thresholds = out;
     }
@@ -506,55 +423,52 @@ function buildSectionConfig(raw: Record<string, unknown>): SectionConfig {
 function mergeConfig(raw: Record<string, unknown>): VeyeConfig {
   const result = cloneDefaults();
 
-  if (typeof raw['wiki_root'] === 'string') {
-    result.wiki_root = raw['wiki_root'];
+  if (typeof raw.wiki_root === 'string') {
+    result.wiki_root = raw.wiki_root;
   }
-  if (typeof raw['wiki_dist_root'] === 'string') {
-    result.wiki_dist_root = raw['wiki_dist_root'];
+  if (typeof raw.wiki_dist_root === 'string') {
+    result.wiki_dist_root = raw.wiki_dist_root;
   }
-  if (typeof raw['threshold'] === 'number') {
-    result.threshold = raw['threshold'];
+  if (typeof raw.threshold === 'number') {
+    result.threshold = raw.threshold;
   }
-  if (
-    typeof raw['combinator'] === 'string' &&
-    COMBINATORS.has(raw['combinator'])
-  ) {
-    result.combinator = raw['combinator'] as Combinator;
+  if (typeof raw.combinator === 'string' && COMBINATORS.has(raw.combinator)) {
+    result.combinator = raw.combinator as Combinator;
   }
-  if (typeof raw['cadence'] === 'string') {
-    result.cadence = raw['cadence'];
+  if (typeof raw.cadence === 'string') {
+    result.cadence = raw.cadence;
   }
-  if (typeof raw['timezone'] === 'string') {
-    result.timezone = raw['timezone'];
+  if (typeof raw.timezone === 'string') {
+    result.timezone = raw.timezone;
   }
-  if (typeof raw['schema_version'] === 'number') {
-    result.schema_version = raw['schema_version'];
+  if (typeof raw.schema_version === 'number') {
+    result.schema_version = raw.schema_version;
   }
-  if (isStringArray(raw['exclude'])) {
-    result.exclude = raw['exclude'];
+  if (isStringArray(raw.exclude)) {
+    result.exclude = raw.exclude;
   }
-  if (isStringArray(raw['source_adapters'])) {
-    result.source_adapters = raw['source_adapters'];
+  if (isStringArray(raw.source_adapters)) {
+    result.source_adapters = raw.source_adapters;
   }
 
-  if (isObject(raw['weights'])) {
-    const w = raw['weights'];
+  if (isObject(raw.weights)) {
+    const w = raw.weights;
     for (const k of Object.keys(w)) {
       if (KPI_NAMES.has(k) && typeof w[k] === 'number') {
         result.weights[k as KpiName] = w[k] as number;
       }
     }
   }
-  if (isObject(raw['kpi_modes'])) {
-    const m = raw['kpi_modes'];
+  if (isObject(raw.kpi_modes)) {
+    const m = raw.kpi_modes;
     for (const k of Object.keys(m)) {
       if (KPI_NAMES.has(k) && typeof m[k] === 'string' && KPI_MODES.has(m[k] as string)) {
         result.kpi_modes[k as KpiName] = m[k] as KpiMode;
       }
     }
   }
-  if (isObject(raw['kpi_params'])) {
-    const kp = raw['kpi_params'];
+  if (isObject(raw.kpi_params)) {
+    const kp = raw.kpi_params;
     for (const k of Object.keys(kp)) {
       if (KPI_NAMES.has(k) && isObject(kp[k])) {
         const kpiName = k as KpiName;
@@ -571,51 +485,48 @@ function mergeConfig(raw: Record<string, unknown>): VeyeConfig {
       }
     }
   }
-  if (isObject(raw['status_thresholds'])) {
-    const st = raw['status_thresholds'];
-    if (typeof st['fresh'] === 'number') {
-      result.status_thresholds.fresh = st['fresh'];
+  if (isObject(raw.status_thresholds)) {
+    const st = raw.status_thresholds;
+    if (typeof st.fresh === 'number') {
+      result.status_thresholds.fresh = st.fresh;
     }
-    if (typeof st['warning'] === 'number') {
-      result.status_thresholds.warning = st['warning'];
-    }
-  }
-
-  if (isObject(raw['gate'])) {
-    const g = raw['gate'];
-    if (typeof g['mode'] === 'string' && GATE_MODES.has(g['mode'])) {
-      result.gate.mode = g['mode'] as GateMode;
-    }
-    if (typeof g['docs_only_label'] === 'string') {
-      result.gate.docs_only_label = g['docs_only_label'];
+    if (typeof st.warning === 'number') {
+      result.status_thresholds.warning = st.warning;
     }
   }
 
-  if (isObject(raw['freshness_block'])) {
-    const fb = raw['freshness_block'];
-    if (
-      typeof fb['status_style'] === 'string' &&
-      STATUS_STYLES.has(fb['status_style'])
-    ) {
-      result.freshness_block.status_style = fb['status_style'] as StatusStyle;
+  if (isObject(raw.gate)) {
+    const g = raw.gate;
+    if (typeof g.mode === 'string' && GATE_MODES.has(g.mode)) {
+      result.gate.mode = g.mode as GateMode;
     }
-    if (isObject(fb['status_emoji']) && result.freshness_block.status_emoji) {
-      const se = fb['status_emoji'];
-      if (typeof se['fresh'] === 'string') {
-        result.freshness_block.status_emoji.fresh = se['fresh'];
+    if (typeof g.docs_only_label === 'string') {
+      result.gate.docs_only_label = g.docs_only_label;
+    }
+  }
+
+  if (isObject(raw.freshness_block)) {
+    const fb = raw.freshness_block;
+    if (typeof fb.status_style === 'string' && STATUS_STYLES.has(fb.status_style)) {
+      result.freshness_block.status_style = fb.status_style as StatusStyle;
+    }
+    if (isObject(fb.status_emoji) && result.freshness_block.status_emoji) {
+      const se = fb.status_emoji;
+      if (typeof se.fresh === 'string') {
+        result.freshness_block.status_emoji.fresh = se.fresh;
       }
-      if (typeof se['warning'] === 'string') {
-        result.freshness_block.status_emoji.warning = se['warning'];
+      if (typeof se.warning === 'string') {
+        result.freshness_block.status_emoji.warning = se.warning;
       }
-      if (typeof se['critical'] === 'string') {
-        result.freshness_block.status_emoji.critical = se['critical'];
+      if (typeof se.critical === 'string') {
+        result.freshness_block.status_emoji.critical = se.critical;
       }
     }
   }
 
-  if (isObject(raw['sections'])) {
+  if (isObject(raw.sections)) {
     const merged: Record<string, SectionConfig> = {};
-    for (const [pathKey, secValue] of Object.entries(raw['sections'])) {
+    for (const [pathKey, secValue] of Object.entries(raw.sections)) {
       if (isObject(secValue)) {
         merged[pathKey] = buildSectionConfig(secValue);
       }
@@ -635,9 +546,7 @@ export function loadConfigYaml(content: string): VeyeConfig {
   try {
     parsed = parseYaml(content);
   } catch (e) {
-    throw new ConfigValidationError([
-      `YAML parse error: ${(e as Error).message}`,
-    ]);
+    throw new ConfigValidationError([`YAML parse error: ${(e as Error).message}`]);
   }
   return validateConfig(parsed);
 }

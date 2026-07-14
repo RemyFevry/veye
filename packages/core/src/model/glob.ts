@@ -5,16 +5,13 @@
  * noise). Explicit literal paths are returned as-is — existence is left for
  * downstream consumers (the `coverage_drift` KPI flags missing references).
  */
-import { readdir } from 'node:fs/promises';
+
 import type { Dirent } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import picomatch from 'picomatch';
 
-const IGNORE_DIRS: ReadonlySet<string> = new Set<string>([
-  '.git',
-  'node_modules',
-  '.veye',
-]);
+const IGNORE_DIRS: ReadonlySet<string> = new Set<string>(['.git', 'node_modules', '.veye']);
 
 function toPosix(p: string): string {
   return p.split(sep).join('/');
@@ -57,10 +54,7 @@ function isGlobPattern(pattern: string): boolean {
  *
  * The result is the deduplicated union, sorted for determinism.
  */
-export async function expandCovers(
-  globs: string[],
-  repoRoot: string,
-): Promise<string[]> {
+export async function expandCovers(globs: string[], repoRoot: string): Promise<string[]> {
   if (globs.length === 0) {
     return [];
   }

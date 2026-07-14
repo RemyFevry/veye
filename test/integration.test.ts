@@ -185,9 +185,7 @@ describe('Veye integration', () => {
 
     // Make a large code change to src/auth/login.ts (auth.md covers src/auth/**).
     const loginPath = path.join(repo, 'src/auth/login.ts');
-    const bigChange =
-      'export const login = "changed significantly";\n' +
-      'export const x = 1;\n'.repeat(100);
+    const bigChange = `export const login = "changed significantly";\n${'export const x = 1;\n'.repeat(100)}`;
     await fs.writeFile(loginPath, bigChange, 'utf8');
     await runGit(repo, ['add', '.']);
     await runGit(repo, ['commit', '-m', 'big change']);
@@ -212,8 +210,7 @@ describe('Veye integration', () => {
     // Add section config to .veye/config.yml. The fixture's config has no
     // `sections:` key, so we insert one immediately before `schema_version:`.
     const config = await readConfig(repo);
-    const inserted =
-      'sections:\n  "auth/":\n    threshold: 50\n';
+    const inserted = 'sections:\n  "auth/":\n    threshold: 50\n';
     const newConfig = replaceOnce(config, 'schema_version: 1', `${inserted}schema_version: 1`);
     await writeConfig(repo, newConfig);
 
@@ -284,18 +281,14 @@ describe('Veye integration', () => {
     await runInit(repo);
 
     expect(await Bun.file(configPath).exists()).toBe(true);
-    expect(
-      await Bun.file(path.join(repo, '.github/workflows/veye-compute.yml')).exists()
-    ).toBe(true);
-    expect(
-      await Bun.file(path.join(repo, '.github/workflows/veye-gate.yml')).exists()
-    ).toBe(true);
+    expect(await Bun.file(path.join(repo, '.github/workflows/veye-compute.yml')).exists()).toBe(
+      true
+    );
+    expect(await Bun.file(path.join(repo, '.github/workflows/veye-gate.yml')).exists()).toBe(true);
     expect(await Bun.file(path.join(repo, '.veye/freshness.json')).exists()).toBe(true);
 
     // The freshly-written freshness.json should be parseable.
-    const onDisk = JSON.parse(
-      await Bun.file(path.join(repo, '.veye/freshness.json')).text()
-    );
+    const onDisk = JSON.parse(await Bun.file(path.join(repo, '.veye/freshness.json')).text());
     expect(onDisk.schema_version).toBe(1);
     expect(Object.keys(onDisk.pages).length).toBeGreaterThan(0);
   });

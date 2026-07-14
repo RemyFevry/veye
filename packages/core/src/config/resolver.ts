@@ -52,7 +52,7 @@ interface SectionMatch {
 function findMatchingSection(
   pageRelPath: string,
   sections: Record<string, SectionConfig>,
-  wikiRoot: string,
+  wikiRoot: string
 ): SectionMatch | null {
   const pageRel = normalizePath(pageRelPath);
   let bestKey: string | null = null;
@@ -60,9 +60,7 @@ function findMatchingSection(
   for (const key of Object.keys(sections)) {
     const sectionRel = relativizeSectionKey(key, wikiRoot);
     const matches =
-      sectionRel === '' ||
-      pageRel === sectionRel ||
-      pageRel.startsWith(`${sectionRel}/`);
+      sectionRel === '' || pageRel === sectionRel || pageRel.startsWith(`${sectionRel}/`);
     if (matches && sectionRel.length > bestLen) {
       bestLen = sectionRel.length;
       bestKey = key;
@@ -83,10 +81,7 @@ function findMatchingSection(
  * 2-level hierarchy. The returned object is fully self-contained — downstream
  * KPI code should never need to look at the raw `VeyeConfig` again.
  */
-export function resolvePageConfig(
-  config: VeyeConfig,
-  page: VeyePage,
-): ResolvedPageConfig {
+export function resolvePageConfig(config: VeyeConfig, page: VeyePage): ResolvedPageConfig {
   const wikiRoot = config.wiki_root;
   const pageRel = relativizeSectionKey(page.path, wikiRoot);
   const section = findMatchingSection(pageRel, config.sections, wikiRoot);
@@ -96,7 +91,7 @@ export function resolvePageConfig(
   let weights = { ...config.weights };
   let combinator: Combinator = config.combinator;
   let kpi_modes: Partial<Record<KpiName, KpiMode>> = { ...config.kpi_modes };
-  let kpi_params: Partial<Record<KpiName, KpiParams>> = {};
+  const kpi_params: Partial<Record<KpiName, KpiParams>> = {};
   for (const k of Object.keys(config.kpi_params) as KpiName[]) {
     const params = config.kpi_params[k];
     if (params) {

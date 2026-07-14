@@ -1,17 +1,17 @@
 #!/usr/bin/env bun
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import {
-  runCompute,
-  runGenerate,
-  runGate,
-  runLint,
-  runScan,
-  runInit,
   formatLintReport,
   lintExitCode,
+  runCompute,
+  runGate,
+  runGenerate,
+  runInit,
+  runLint,
+  runScan,
 } from '@veye/core';
 
 // Injected at build time via `bun build --define VEYE_VERSION="..."`.
@@ -118,6 +118,7 @@ async function main() {
         if (output) console.log(output);
         else console.log('No issues found.');
         process.exit(lintExitCode(report));
+        break;
       }
       case 'scan': {
         const result = await runScan(repoRoot);
