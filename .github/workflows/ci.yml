@@ -17,6 +17,8 @@ jobs:
       - run: bun install
       - run: bun run typecheck
       - run: bun run lint
+      - name: Build CLI binary
+        run: bash scripts/verify-binary.sh
       - run: bun test
 
   build-binary:

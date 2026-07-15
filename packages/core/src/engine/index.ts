@@ -9,15 +9,15 @@ import type {
   VeyeConfig,
   VeyePage,
 } from '../types/index.js';
+import { age } from './age.js';
+import { computeComposite } from './composite.js';
 import { coverage_drift } from './coverage-drift.js';
 import { direct_code_delta } from './direct-code-delta.js';
-import { age } from './age.js';
 import { detectCycle, transitive_staleness } from './transitive-staleness.js';
-import { computeComposite } from './composite.js';
 
 export * from './age.js';
-export * from './coverage-drift.js';
 export * from './composite.js';
+export * from './coverage-drift.js';
 export * from './direct-code-delta.js';
 export * from './transitive-staleness.js';
 
@@ -62,7 +62,11 @@ function resolveEffective(config: VeyeConfig, section: SectionConfig): Effective
   };
 }
 
-function isKpiActive(kpi: KpiName, eff: EffectiveConfig, excludedKpis: readonly KpiName[]): boolean {
+function isKpiActive(
+  kpi: KpiName,
+  eff: EffectiveConfig,
+  excludedKpis: readonly KpiName[]
+): boolean {
   if (excludedKpis.includes(kpi)) return false;
   const mode = eff.kpiModes[kpi] ?? 'enabled';
   return mode === 'enabled';
@@ -91,7 +95,7 @@ export async function computePageFreshness(
   resolvedConfig: SectionConfig = {},
   now: Date = new Date(),
   memo: Map<string, PageFreshnessResult> = new Map(),
-  inProgress: Set<string> = new Set(),
+  inProgress: Set<string> = new Set()
 ): Promise<PageFreshnessResult> {
   const cached = memo.get(page.path);
   if (cached) return cached;
@@ -134,7 +138,7 @@ export async function computePageFreshness(
         {},
         now,
         memo,
-        inProgress,
+        inProgress
       );
       if (inProgress.has(dep)) continue;
       depScores.push(depResult.score);

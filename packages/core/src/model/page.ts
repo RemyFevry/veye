@@ -5,17 +5,14 @@
  * required frontmatter are still returned with `hasErrors: true` so callers
  * (dashboard, lint) can surface them.
  */
-import { readdir, readFile, stat } from 'node:fs/promises';
+
 import type { Dirent } from 'node:fs';
+import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, relative, sep } from 'node:path';
 import type { VeyePage } from '../types/index.js';
 import { parseFrontmatter } from './frontmatter.js';
 
-const IGNORE_DIRS: ReadonlySet<string> = new Set<string>([
-  '.git',
-  'node_modules',
-  '.veye',
-]);
+const IGNORE_DIRS: ReadonlySet<string> = new Set<string>(['.git', 'node_modules', '.veye']);
 
 function toPosix(p: string): string {
   return p.split(sep).join('/');
@@ -50,10 +47,7 @@ async function walkMarkdown(dir: string): Promise<string[]> {
  * filtered out; pages with invalid frontmatter are retained and flagged via
  * `hasErrors`.
  */
-export async function discoverPages(
-  wikiRoot: string,
-  repoRoot: string,
-): Promise<VeyePage[]> {
+export async function discoverPages(wikiRoot: string, repoRoot: string): Promise<VeyePage[]> {
   const absRoot = join(repoRoot, wikiRoot);
   try {
     const s = await stat(absRoot);

@@ -68,7 +68,9 @@ export function computeComposite(input: CompositeInput): CompositeResult {
     if (totalWeight <= 0) {
       score = active.reduce((sum, a) => sum + a.score.score, 0) / active.length;
     } else {
-      score = active.reduce((sum, a) => sum + a.score.score * (input.weights[a.kpi] ?? 0), 0) / totalWeight;
+      score =
+        active.reduce((sum, a) => sum + a.score.score * (input.weights[a.kpi] ?? 0), 0) /
+        totalWeight;
     }
   }
   score = round2(score);

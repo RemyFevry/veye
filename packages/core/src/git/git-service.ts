@@ -40,7 +40,7 @@ export class GitServiceImpl implements GitService {
 
   private async runText(
     args: string[],
-    opts: { allowNonZero?: boolean } = {},
+    opts: { allowNonZero?: boolean } = {}
   ): Promise<{ stdout: string; code: number }> {
     const proc = Bun.spawn(['git', ...args], {
       cwd: this.repoRoot,
@@ -87,7 +87,10 @@ export class GitServiceImpl implements GitService {
 
   async changedFiles(base: string, head: string): Promise<string[]> {
     const { stdout } = await this.runText(['diff', '--name-only', `${base}..${head}`]);
-    return stdout.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+    return stdout
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
   }
 
   private async show(path: string, ref: string): Promise<string> {
@@ -110,8 +113,16 @@ export class GitServiceImpl implements GitService {
     await Bun.write(headFile, headBody);
     try {
       const { stdout } = await this.runText(
-        ['diff', '--no-index', '--no-color', '--src-prefix=a/', '--dst-prefix=b/', baseFile, headFile],
-        { allowNonZero: true },
+        [
+          'diff',
+          '--no-index',
+          '--no-color',
+          '--src-prefix=a/',
+          '--dst-prefix=b/',
+          baseFile,
+          headFile,
+        ],
+        { allowNonZero: true }
       );
       return stdout;
     } finally {

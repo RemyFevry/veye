@@ -1,0 +1,7 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.veye/freshness.json
+wiki.dist/
+.DS_Store
+*.log

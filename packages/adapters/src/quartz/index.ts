@@ -8,8 +8,8 @@ import type {
   StatusCode,
   TriggerReason,
 } from '@veye/core';
-import { buildInteractiveDashboard } from './dashboard.js';
 import type { DashboardFilters } from './dashboard.js';
+import { buildInteractiveDashboard } from './dashboard.js';
 
 export type {
   DashboardFilters,
@@ -77,10 +77,7 @@ function deepFreeze(value: unknown): void {
   Object.freeze(value);
 }
 
-function buildBadgeData(
-  result: PageFreshnessResult,
-  computedAt: string,
-): FreshnessBadgeData {
+function buildBadgeData(result: PageFreshnessResult, computedAt: string): FreshnessBadgeData {
   const subScores: FreshnessSubScoreData[] = [];
   for (const kpi of KPI_ORDER) {
     const s = result.sub_scores[kpi];
@@ -134,8 +131,7 @@ export class QuartzAdapter {
 
   getFreshnessBadge(pagePath: string): QuartzComponent {
     const result = this.data.pages[pagePath];
-    const badge =
-      result !== undefined ? buildBadgeData(result, this.data.computed_at) : null;
+    const badge = result !== undefined ? buildBadgeData(result, this.data.computed_at) : null;
     return {
       component: 'FreshnessBadge',
       props: { badge },
@@ -153,7 +149,7 @@ export class QuartzAdapter {
   decoratePage(
     frontmatter: Readonly<Record<string, unknown>>,
     body: string,
-    freshnessEntry: PageFreshnessResult,
+    freshnessEntry: PageFreshnessResult
   ): DecoratedPage {
     const badge = buildBadgeData(freshnessEntry, this.data.computed_at);
     return {
@@ -165,7 +161,7 @@ export class QuartzAdapter {
   verifyReadOnlyIntegrity(): void {
     if (!Object.isFrozen(this.data)) {
       throw new Error(
-        'QuartzAdapter integrity violated: freshness data must remain frozen (read-only)',
+        'QuartzAdapter integrity violated: freshness data must remain frozen (read-only)'
       );
     }
   }

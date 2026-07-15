@@ -1,0 +1,14 @@
+wiki_root: docs/wiki/
+wiki_dist_root: docs/wiki.dist/
+threshold: 75
+combinator: weighted-avg
+gate:
+  mode: advisory
+  docs_only_label: veye:docs-only
+freshness_block:
+  status_style: emoji
+  status_emoji:
+    fresh: 🟢
+    warning: 🟡
+    critical: 🔴
+schema_version: 1
